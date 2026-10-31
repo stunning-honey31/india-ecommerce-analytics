@@ -60,3 +60,33 @@ def get_order_by_state():
     df = pd.read_sql_query(query, conn)
     conn.close()
     return df
+
+def get_cancellation_by_fulfilment():
+    query = """
+        SELECT fulfilment,
+               COUNT(*) AS total_orders,
+               SUM(CASE WHEN status LIKE 'Cancelled%' THEN 1 ELSE 0 END) AS cancelled,
+               ROUND(100.0 * SUM(CASE WHEN status LIKE 'Cancelled%' THEN 1 ELSE 0 END)
+                     / COUNT(*), 2) AS cancel_rate_pct
+        FROM orders
+        GROUP BY fulfilment
+    """
+    conn = get_connection()
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df
+
+
+def get_order_by_id(order_id):
+    query = """
+        SELECT o.order_id, o.order_date, o.status, o.ship_city, o.ship_state,
+               p.category, p.size, oi.qty, oi.amount
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.sku = p.sku
+        WHERE o.order_id = ?
+    """
+    conn = get_connection()
+    df = pd.read_sql_query(query, conn, params=(order_id,))
+    conn.close()
+    return df

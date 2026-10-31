@@ -1,5 +1,7 @@
-from services.sales import (get_revenue_by_month, get_top_categories, get_kpis, get_order_by_state)
-from services.orders import get_cancellation_by_fulfilment, get_order_by_id
+from services.sales import (
+    get_revenue_by_month, get_top_categories, get_kpis,
+    get_order_by_state, get_cancellation_by_fulfilment, get_order_by_id
+)
 
 print(get_kpis())
 print(get_order_by_state().head(10))
